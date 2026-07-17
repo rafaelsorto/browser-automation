@@ -1,14 +1,14 @@
-import { SignIn } from "@clerk/tanstack-react-start"
+import { SignUp } from "@clerk/tanstack-react-start"
 import { createFileRoute } from "@tanstack/react-router"
 
-export const Route = createFileRoute("/sign-in/$")({
+export const Route = createFileRoute("/_auth/sign-up/$")({
   component: Page,
 })
 
 function Page() {
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <SignIn />
+      <SignUp />
     </div>
   )
 }
