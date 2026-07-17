@@ -1,4 +1,5 @@
 import {
+  OrganizationSwitcher,
   Show,
   SignInButton,
   SignUpButton,
@@ -16,7 +17,10 @@ function App() {
       <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
         <div className="flex items-center gap-2">
           <Show when="signed-in">
-            <UserButton />
+            <div className="flex flex-col gap-2">
+              <UserButton />
+              <OrganizationSwitcher hidePersonal />
+            </div>
           </Show>
           <Show when="signed-out">
             <SignInButton>

@@ -45,7 +45,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <ClerkProvider appearance={{ theme: shadcn }}>
+        <ClerkProvider
+          appearance={{ theme: shadcn }}
+          taskUrls={{
+            "choose-organization": "/session-tasks/choose-organization",
+          }}
+        >
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
