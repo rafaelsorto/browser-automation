@@ -1,4 +1,7 @@
-import { OrganizationSwitcher, UserButton } from "@clerk/tanstack-react-start"
+import {
+  OrganizationSwitcher,
+  UserButton,
+} from "@clerk/tanstack-react-start"
 import { PlusIcon, WorkflowIcon } from "lucide-react"
 import type { ComponentProps } from "react"
 
@@ -24,20 +27,14 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar"
+import type { SerializedWorkflow } from "@/features/workflows/lib/serialize-workflow"
+import { Route } from "@/routes/_dashboard"
 
-const WORKFLOWS = [
-  "dominant-wasp",
-  "honest-reindeer",
-  "expected-llama",
-  "essential-ocelot",
-  "creepy-echidna",
-  "eastern-silkworm",
-  "cultural-lion",
-  "proud-weasel",
-  "regional-bonobo",
-] as const
-
-function WorkflowNav() {
+function WorkflowNav({
+  workflows,
+}: {
+  workflows: SerializedWorkflow[]
+}) {
   const { state, isMobile } = useSidebar()
 
   if (state === "collapsed" && !isMobile) {
@@ -54,18 +51,21 @@ function WorkflowNav() {
                   </SidebarMenuButton>
                 </PopoverTrigger>
                 <PopoverContent side="right" align="start">
-                  <Button variant="ghost" className="w-full justify-start">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                  >
                     <PlusIcon />
                     New workflow
                   </Button>
                   <Separator />
-                  {WORKFLOWS.map((workflow) => (
+                  {workflows.map((workflow) => (
                     <Button
-                      key={workflow}
+                      key={workflow.id}
                       variant="ghost"
                       className="w-full justify-start"
                     >
-                      {workflow}
+                      {workflow.name}
                     </Button>
                   ))}
                 </PopoverContent>
@@ -86,10 +86,10 @@ function WorkflowNav() {
       </SidebarGroupAction>
       <SidebarGroupContent>
         <SidebarMenu>
-          {WORKFLOWS.map((workflow, index) => (
-            <SidebarMenuItem key={workflow}>
-              <SidebarMenuButton isActive={index === 0}>
-                <span>{workflow}</span>
+          {workflows.map((workflow) => (
+            <SidebarMenuItem key={workflow.id}>
+              <SidebarMenuButton>
+                <span>{workflow.name}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
@@ -99,7 +99,11 @@ function WorkflowNav() {
   )
 }
 
-export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  ...props
+}: ComponentProps<typeof Sidebar>) {
+  const { workflows } = Route.useLoaderData()
+
   return (
     <Sidebar variant="inset" collapsible="icon" {...props}>
       <SidebarHeader>
@@ -126,7 +130,7 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
 
       <SidebarContent>
-        <WorkflowNav />
+        <WorkflowNav workflows={workflows} />
       </SidebarContent>
 
       <SidebarFooter>

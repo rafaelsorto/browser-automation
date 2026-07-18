@@ -1,5 +1,9 @@
 import { auth } from "@clerk/tanstack-react-start/server"
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router"
+import {
+  createFileRoute,
+  Outlet,
+  redirect,
+} from "@tanstack/react-router"
 import { createServerFn } from "@tanstack/react-start"
 
 import { AppSidebar } from "@/components/app-sidebar"
@@ -9,6 +13,8 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { listWorkflows } from "@/features/workflows/data"
+import { serializeWorkflows } from "@/features/workflows/lib/serialize-workflow"
 
 const requireAuth = createServerFn().handler(async () => {
   const { isAuthenticated, userId } = await auth()
@@ -23,8 +29,17 @@ const requireAuth = createServerFn().handler(async () => {
   return { userId }
 })
 
+const loadWorkflows = createServerFn().handler(async () => {
+  const { orgId } = await auth()
+  const workflows = orgId ? await listWorkflows(orgId) : []
+  return serializeWorkflows(workflows)
+})
+
 export const Route = createFileRoute("/_dashboard")({
   beforeLoad: async () => await requireAuth(),
+  loader: async () => ({
+    workflows: await loadWorkflows(),
+  }),
   component: RouteComponent,
 })
 
