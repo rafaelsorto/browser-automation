@@ -1,9 +1,17 @@
-import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core'
+import { jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core"
 
-export const demoUsers = pgTable('demo_users', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true })
+export const workflows = pgTable("workflows", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orgId: text("org_id").notNull(),
+  name: text("name").notNull(),
+  graph: jsonb("graph").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
 })
+
+export type Workflow = typeof workflows.$inferSelect
+export type NewWorkflow = typeof workflows.$inferInsert
