@@ -1,27 +1,15 @@
 import { auth } from "@clerk/tanstack-react-start/server"
 import { redirect } from "@tanstack/react-router"
 import { createServerFn } from "@tanstack/react-start"
-import { desc, eq } from "drizzle-orm"
 
-import { db } from "@/db"
-import { workflows } from "@/db/schema"
+import { createWorkflow, listWorkflows } from "@/features/workflows/data.server"
+import { serializeWorkflows } from "@/features/workflows/lib/serialize-workflow"
 
-export function listWorkflows(orgId: string) {
-  return db
-    .select()
-    .from(workflows)
-    .where(eq(workflows.orgId, orgId))
-    .orderBy(desc(workflows.createdAt))
-}
-
-export async function createWorkflow(orgId: string, name: string) {
-  const [workflow] = await db
-    .insert(workflows)
-    .values({ orgId, name, graph: {} })
-    .returning()
-
-  return workflow
-}
+export const listWorkflowsFn = createServerFn().handler(async () => {
+  const { orgId } = await auth()
+  const workflows = orgId ? await listWorkflows(orgId) : []
+  return serializeWorkflows(workflows)
+})
 
 export const createWorkflowFn = createServerFn({ method: "POST" })
   .validator((data: { name: string }) => data)

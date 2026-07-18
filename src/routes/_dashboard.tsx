@@ -13,8 +13,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { listWorkflows } from "@/features/workflows/data"
-import { serializeWorkflows } from "@/features/workflows/lib/serialize-workflow"
+import { listWorkflowsFn } from "@/features/workflows/data"
 
 const requireAuth = createServerFn().handler(async () => {
   const { isAuthenticated, userId } = await auth()
@@ -29,16 +28,10 @@ const requireAuth = createServerFn().handler(async () => {
   return { userId }
 })
 
-const loadWorkflows = createServerFn().handler(async () => {
-  const { orgId } = await auth()
-  const workflows = orgId ? await listWorkflows(orgId) : []
-  return serializeWorkflows(workflows)
-})
-
 export const Route = createFileRoute("/_dashboard")({
   beforeLoad: async () => await requireAuth(),
   loader: async () => ({
-    workflows: await loadWorkflows(),
+    workflows: await listWorkflowsFn(),
   }),
   component: RouteComponent,
 })

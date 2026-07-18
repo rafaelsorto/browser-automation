@@ -2,6 +2,7 @@ import {
   OrganizationSwitcher,
   UserButton,
 } from "@clerk/tanstack-react-start"
+import { useServerFn } from "@tanstack/react-start"
 import { PlusIcon, WorkflowIcon } from "lucide-react"
 import type { ComponentProps } from "react"
 
@@ -27,6 +28,8 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { createWorkflowFn } from "@/features/workflows/data"
+import { generateSlug } from "@/features/workflows/lib/generate-slug"
 import type { SerializedWorkflow } from "@/features/workflows/lib/serialize-workflow"
 import { Route } from "@/routes/_dashboard"
 
@@ -36,6 +39,11 @@ function WorkflowNav({
   workflows: SerializedWorkflow[]
 }) {
   const { state, isMobile } = useSidebar()
+  const createWorkflow = useServerFn(createWorkflowFn)
+
+  const handleCreateWorkflow = () => {
+    void createWorkflow({ data: { name: generateSlug() } })
+  }
 
   if (state === "collapsed" && !isMobile) {
     return (
@@ -54,6 +62,7 @@ function WorkflowNav({
                   <Button
                     variant="ghost"
                     className="w-full justify-start"
+                    onClick={handleCreateWorkflow}
                   >
                     <PlusIcon />
                     New workflow
@@ -80,7 +89,10 @@ function WorkflowNav({
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Workflows</SidebarGroupLabel>
-      <SidebarGroupAction title="New workflow">
+      <SidebarGroupAction
+        title="New workflow"
+        onClick={handleCreateWorkflow}
+      >
         <PlusIcon />
         <span className="sr-only">New workflow</span>
       </SidebarGroupAction>
