@@ -2,6 +2,13 @@ import { OrganizationSwitcher, UserButton } from "@clerk/tanstack-react-start"
 import { PlusIcon, WorkflowIcon } from "lucide-react"
 import type { ComponentProps } from "react"
 
+import { Button } from "@/components/ui/button"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Separator } from "@/components/ui/separator"
 import {
   Sidebar,
   SidebarContent,
@@ -15,6 +22,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar"
 
 const WORKFLOWS = [
@@ -28,6 +36,68 @@ const WORKFLOWS = [
   "proud-weasel",
   "regional-bonobo",
 ] as const
+
+function WorkflowNav() {
+  const { state, isMobile } = useSidebar()
+
+  if (state === "collapsed" && !isMobile) {
+    return (
+      <SidebarGroup>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <SidebarMenuButton>
+                    <WorkflowIcon />
+                    <span className="sr-only">Workflows</span>
+                  </SidebarMenuButton>
+                </PopoverTrigger>
+                <PopoverContent side="right" align="start">
+                  <Button variant="ghost" className="w-full justify-start">
+                    <PlusIcon />
+                    New workflow
+                  </Button>
+                  <Separator />
+                  {WORKFLOWS.map((workflow) => (
+                    <Button
+                      key={workflow}
+                      variant="ghost"
+                      className="w-full justify-start"
+                    >
+                      {workflow}
+                    </Button>
+                  ))}
+                </PopoverContent>
+              </Popover>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    )
+  }
+
+  return (
+    <SidebarGroup>
+      <SidebarGroupLabel>Workflows</SidebarGroupLabel>
+      <SidebarGroupAction title="New workflow">
+        <PlusIcon />
+        <span className="sr-only">New workflow</span>
+      </SidebarGroupAction>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {WORKFLOWS.map((workflow, index) => (
+            <SidebarMenuItem key={workflow}>
+              <SidebarMenuButton isActive={index === 0}>
+                <span>{workflow}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  )
+}
 
 export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
   return (
@@ -56,25 +126,7 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Workflows</SidebarGroupLabel>
-          <SidebarGroupAction title="New workflow">
-            <PlusIcon />
-            <span className="sr-only">New workflow</span>
-          </SidebarGroupAction>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {WORKFLOWS.map((workflow, index) => (
-                <SidebarMenuItem key={workflow}>
-                  <SidebarMenuButton isActive={index === 0} tooltip={workflow}>
-                    <WorkflowIcon />
-                    <span>{workflow}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <WorkflowNav />
       </SidebarContent>
 
       <SidebarFooter>
