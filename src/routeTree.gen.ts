@@ -10,7 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestRouteImport } from './routes/test'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardRouteImport } from './routes/_dashboard'
+import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
 import { Route as SessionTasksChooseOrganizationRouteImport } from './routes/session-tasks/choose-organization'
 import { Route as AuthSignUpSplatRouteImport } from './routes/_auth/sign-up.$'
 import { Route as AuthSignInSplatRouteImport } from './routes/_auth/sign-in.$'
@@ -20,10 +21,14 @@ const TestRoute = TestRouteImport.update({
   path: '/test',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/_dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => DashboardRoute,
 } as any)
 const SessionTasksChooseOrganizationRoute =
   SessionTasksChooseOrganizationRouteImport.update({
@@ -43,24 +48,25 @@ const AuthSignInSplatRoute = AuthSignInSplatRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof DashboardIndexRoute
   '/test': typeof TestRoute
   '/session-tasks/choose-organization': typeof SessionTasksChooseOrganizationRoute
   '/sign-in/$': typeof AuthSignInSplatRoute
   '/sign-up/$': typeof AuthSignUpSplatRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/test': typeof TestRoute
   '/session-tasks/choose-organization': typeof SessionTasksChooseOrganizationRoute
+  '/': typeof DashboardIndexRoute
   '/sign-in/$': typeof AuthSignInSplatRoute
   '/sign-up/$': typeof AuthSignUpSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_dashboard': typeof DashboardRouteWithChildren
   '/test': typeof TestRoute
   '/session-tasks/choose-organization': typeof SessionTasksChooseOrganizationRoute
+  '/_dashboard/': typeof DashboardIndexRoute
   '/_auth/sign-in/$': typeof AuthSignInSplatRoute
   '/_auth/sign-up/$': typeof AuthSignUpSplatRoute
 }
@@ -74,22 +80,23 @@ export interface FileRouteTypes {
     | '/sign-up/$'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/test'
     | '/session-tasks/choose-organization'
+    | '/'
     | '/sign-in/$'
     | '/sign-up/$'
   id:
     | '__root__'
-    | '/'
+    | '/_dashboard'
     | '/test'
     | '/session-tasks/choose-organization'
+    | '/_dashboard/'
     | '/_auth/sign-in/$'
     | '/_auth/sign-up/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
   TestRoute: typeof TestRoute
   SessionTasksChooseOrganizationRoute: typeof SessionTasksChooseOrganizationRoute
   AuthSignInSplatRoute: typeof AuthSignInSplatRoute
@@ -105,12 +112,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TestRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
+    '/_dashboard': {
+      id: '/_dashboard'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_dashboard/': {
+      id: '/_dashboard/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/session-tasks/choose-organization': {
       id: '/session-tasks/choose-organization'
@@ -136,8 +150,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface DashboardRouteChildren {
+  DashboardIndexRoute: typeof DashboardIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardIndexRoute: DashboardIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRouteWithChildren,
   TestRoute: TestRoute,
   SessionTasksChooseOrganizationRoute: SessionTasksChooseOrganizationRoute,
   AuthSignInSplatRoute: AuthSignInSplatRoute,
