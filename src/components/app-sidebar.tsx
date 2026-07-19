@@ -2,6 +2,7 @@ import {
   OrganizationSwitcher,
   UserButton,
 } from "@clerk/tanstack-react-start"
+import { Link, useMatchRoute } from "@tanstack/react-router"
 import { useServerFn } from "@tanstack/react-start"
 import { PlusIcon, WorkflowIcon } from "lucide-react"
 import type { ComponentProps } from "react"
@@ -39,6 +40,7 @@ function WorkflowNav({
   workflows: SerializedWorkflow[]
 }) {
   const { state, isMobile } = useSidebar()
+  const matchRoute = useMatchRoute()
   const createWorkflow = useServerFn(createWorkflowFn)
 
   const handleCreateWorkflow = () => {
@@ -73,8 +75,14 @@ function WorkflowNav({
                       key={workflow.id}
                       variant="ghost"
                       className="w-full justify-start"
+                      asChild
                     >
-                      {workflow.name}
+                      <Link
+                        to="/workflows/$id"
+                        params={{ id: workflow.id }}
+                      >
+                        {workflow.name}
+                      </Link>
                     </Button>
                   ))}
                 </PopoverContent>
@@ -100,8 +108,18 @@ function WorkflowNav({
         <SidebarMenu>
           {workflows.map((workflow) => (
             <SidebarMenuItem key={workflow.id}>
-              <SidebarMenuButton>
-                <span>{workflow.name}</span>
+              <SidebarMenuButton
+                asChild
+                isActive={
+                  !!matchRoute({
+                    to: "/workflows/$id",
+                    params: { id: workflow.id },
+                  })
+                }
+              >
+                <Link to="/workflows/$id" params={{ id: workflow.id }}>
+                  <span>{workflow.name}</span>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}

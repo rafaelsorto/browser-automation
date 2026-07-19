@@ -13,6 +13,7 @@ import { Route as TestRouteImport } from './routes/test'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
 import { Route as SessionTasksChooseOrganizationRouteImport } from './routes/session-tasks/choose-organization'
+import { Route as DashboardWorkflowsIdRouteImport } from './routes/_dashboard/workflows/$id'
 import { Route as AuthSignUpSplatRouteImport } from './routes/_auth/sign-up.$'
 import { Route as AuthSignInSplatRouteImport } from './routes/_auth/sign-in.$'
 
@@ -36,6 +37,11 @@ const SessionTasksChooseOrganizationRoute =
     path: '/session-tasks/choose-organization',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DashboardWorkflowsIdRoute = DashboardWorkflowsIdRouteImport.update({
+  id: '/workflows/$id',
+  path: '/workflows/$id',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const AuthSignUpSplatRoute = AuthSignUpSplatRouteImport.update({
   id: '/_auth/sign-up/$',
   path: '/sign-up/$',
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/session-tasks/choose-organization': typeof SessionTasksChooseOrganizationRoute
   '/sign-in/$': typeof AuthSignInSplatRoute
   '/sign-up/$': typeof AuthSignUpSplatRoute
+  '/workflows/$id': typeof DashboardWorkflowsIdRoute
 }
 export interface FileRoutesByTo {
   '/test': typeof TestRoute
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/': typeof DashboardIndexRoute
   '/sign-in/$': typeof AuthSignInSplatRoute
   '/sign-up/$': typeof AuthSignUpSplatRoute
+  '/workflows/$id': typeof DashboardWorkflowsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/_dashboard/': typeof DashboardIndexRoute
   '/_auth/sign-in/$': typeof AuthSignInSplatRoute
   '/_auth/sign-up/$': typeof AuthSignUpSplatRoute
+  '/_dashboard/workflows/$id': typeof DashboardWorkflowsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -78,6 +87,7 @@ export interface FileRouteTypes {
     | '/session-tasks/choose-organization'
     | '/sign-in/$'
     | '/sign-up/$'
+    | '/workflows/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/test'
@@ -85,6 +95,7 @@ export interface FileRouteTypes {
     | '/'
     | '/sign-in/$'
     | '/sign-up/$'
+    | '/workflows/$id'
   id:
     | '__root__'
     | '/_dashboard'
@@ -93,6 +104,7 @@ export interface FileRouteTypes {
     | '/_dashboard/'
     | '/_auth/sign-in/$'
     | '/_auth/sign-up/$'
+    | '/_dashboard/workflows/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -133,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SessionTasksChooseOrganizationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_dashboard/workflows/$id': {
+      id: '/_dashboard/workflows/$id'
+      path: '/workflows/$id'
+      fullPath: '/workflows/$id'
+      preLoaderRoute: typeof DashboardWorkflowsIdRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_auth/sign-up/$': {
       id: '/_auth/sign-up/$'
       path: '/sign-up/$'
@@ -152,10 +171,12 @@ declare module '@tanstack/react-router' {
 
 interface DashboardRouteChildren {
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardWorkflowsIdRoute: typeof DashboardWorkflowsIdRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardWorkflowsIdRoute: DashboardWorkflowsIdRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(

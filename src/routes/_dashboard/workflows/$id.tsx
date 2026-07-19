@@ -1,0 +1,92 @@
+import {
+  createFileRoute,
+  notFound,
+  type ErrorComponentProps,
+} from "@tanstack/react-router"
+import { AlertCircleIcon, SearchXIcon } from "lucide-react"
+
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty"
+import { Spinner } from "@/components/ui/spinner"
+import { getWorkflowFn } from "@/features/workflows/data"
+
+export const Route = createFileRoute("/_dashboard/workflows/$id")({
+  loader: async ({ params }) => {
+    const workflow = await getWorkflowFn({ data: { id: params.id } })
+
+    if (!workflow) {
+      throw notFound()
+    }
+
+    return { workflow }
+  },
+  pendingComponent: WorkflowPending,
+  errorComponent: WorkflowError,
+  notFoundComponent: WorkflowNotFound,
+  component: WorkflowPage,
+})
+
+function WorkflowPending() {
+  return (
+    <div className="flex min-h-svh items-center justify-center">
+      <Spinner className="size-6" />
+    </div>
+  )
+}
+
+function WorkflowError({ error }: ErrorComponentProps) {
+  return (
+    <div className="flex min-h-svh">
+      <Empty>
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <AlertCircleIcon />
+          </EmptyMedia>
+          <EmptyTitle className="text-base font-semibold">
+            Something went wrong
+          </EmptyTitle>
+          <EmptyDescription>
+            {error.message || "Failed to load this workflow. Please try again."}
+          </EmptyDescription>
+        </EmptyHeader>
+      </Empty>
+    </div>
+  )
+}
+
+function WorkflowNotFound() {
+  return (
+    <div className="flex min-h-svh">
+      <Empty>
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <SearchXIcon />
+          </EmptyMedia>
+          <EmptyTitle className="text-base font-semibold">
+            Workflow not found
+          </EmptyTitle>
+          <EmptyDescription>
+            This workflow does not exist or you do not have access to it.
+          </EmptyDescription>
+        </EmptyHeader>
+      </Empty>
+    </div>
+  )
+}
+
+function WorkflowPage() {
+  const { workflow } = Route.useLoaderData()
+
+  return (
+    <div className="flex min-h-svh flex-col p-6">
+      <h1 className="font-heading text-lg font-semibold tracking-tight">
+        {workflow.name}
+      </h1>
+    </div>
+  )
+}
