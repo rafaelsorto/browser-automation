@@ -9,24 +9,38 @@ import {
   ConnectionLineType,
 } from "@xyflow/react"
 import type {
-  Node,
   Edge,
   OnNodesChange,
   OnEdgesChange,
   OnConnect,
   ColorMode,
+  NodeTypes,
 } from "@xyflow/react"
 import { useTheme } from "next-themes"
 import "@xyflow/react/dist/style.css"
 
-const initialNodes: Node[] = [
-  { id: "n1", position: { x: 0, y: 0 }, data: { label: "Node 1" } },
-  { id: "n2", position: { x: 0, y: 100 }, data: { label: "Node 2" } },
+import { StepNode } from "@/features/workflows/components/step-node"
+import type { StepNodeType } from "@/features/workflows/nodes/node-registry"
+
+const nodeTypes: NodeTypes = {
+  step: StepNode,
+}
+
+const initialNodes: StepNodeType[] = [
+  {
+    id: "start",
+    type: "step",
+    position: { x: 0, y: 0 },
+    data: {
+      type: "start",
+      kind: "trigger",
+      title: "Start",
+      values: {},
+    },
+  },
 ]
 
-const initialEdges: Edge[] = [
-  { id: "n1-n2", source: "n1", target: "n2" },
-]
+const initialEdges: Edge[] = []
 
 export function Canvas() {
   const { resolvedTheme } = useTheme()
@@ -69,6 +83,7 @@ export function Canvas() {
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
