@@ -47,6 +47,9 @@ importers:
       '@tanstack/router-plugin':
         specifier: latest
         version: 1.168.20(@tanstack/react-router@1.170.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(esbuild@0.28.1)(rolldown@1.1.5)(vite@8.1.5(@types/node@22.20.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))
+      '@trigger.dev/react-hooks':
+        specifier: 4.5.4
+        version: 4.5.4(bufferutil@4.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(utf-8-validate@6.0.6)
       '@trigger.dev/sdk':
         specifier: ^4.5.4
         version: 4.5.4(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6)(zod@4.4.3)
@@ -3184,6 +3187,13 @@ packages:
   '@trigger.dev/core@4.5.4':
     resolution: {integrity: sha512-+PqaL5ltwu523EYummK4spG76VeAD+GtoGCbjzGGD1A54EOFmamgfTKg25sgoWVpd2hyp1xno5gQrsjcpvH0IQ==}
     engines: {node: '>=18.20.0'}
+
+  '@trigger.dev/react-hooks@4.5.4':
+    resolution: {integrity: sha512-9QcB1ZgfuaLMPubkIllwMl2hK2hnIOluQcBP8975E6wKJuC4q5TyViOM0imJ52zHilZnItuZjLlHVLdLfNN91Q==}
+    engines: {node: '>=18.20.0'}
+    peerDependencies:
+      react: ^18.0 || ^19.0 || ^19.0.0-rc
+      react-dom: ^18.0 || ^19.0 || ^19.0.0-rc
 
   '@trigger.dev/sdk@4.5.4':
     resolution: {integrity: sha512-Sig0/OdS6bAdpagJve2GNnvDX0139EjbMPePX0FaVwa2RjU0ff3f/y/LBunS/+rTVanK0xQ2E2RmdbYJasz66g==}
@@ -6386,6 +6396,11 @@ packages:
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+
+  swr@2.4.2:
+    resolution: {integrity: sha512-ej644Y2bvkIajfR32KGeSSdBXQW+ScjGjkybZgSE7kFpk9eGnV44XY9FJylXi+W75pavSX1PVNB57W5EbhGIYw==}
+    peerDependencies:
+      react: ^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   symbol-tree@3.2.4:
     resolution: {integrity: sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==}
@@ -10286,6 +10301,17 @@ snapshots:
       - supports-color
       - utf-8-validate
 
+  '@trigger.dev/react-hooks@4.5.4(bufferutil@4.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(utf-8-validate@6.0.6)':
+    dependencies:
+      '@trigger.dev/core': 4.5.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      react: 19.2.7
+      react-dom: 19.2.7(react@19.2.7)
+      swr: 2.4.2(react@19.2.7)
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
   '@trigger.dev/sdk@4.5.4(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6)(zod@4.4.3)':
     dependencies:
       '@opentelemetry/api': 1.9.1
@@ -13587,6 +13613,12 @@ snapshots:
       has-flag: 4.0.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
+
+  swr@2.4.2(react@19.2.7):
+    dependencies:
+      dequal: 2.0.3
+      react: 19.2.7
+      use-sync-external-store: 1.6.0(react@19.2.7)
 
   symbol-tree@3.2.4: {}
 
