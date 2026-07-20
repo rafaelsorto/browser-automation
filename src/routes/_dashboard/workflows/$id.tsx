@@ -1,8 +1,5 @@
-import {
-  createFileRoute,
-  notFound,
-  type ErrorComponentProps,
-} from "@tanstack/react-router"
+import { createFileRoute, notFound } from "@tanstack/react-router"
+import type { ErrorComponentProps } from "@tanstack/react-router"
 import { AlertCircleIcon, SearchXIcon } from "lucide-react"
 
 import {
@@ -13,6 +10,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty"
 import { Spinner } from "@/components/ui/spinner"
+import { WorkflowShell } from "@/features/workflows/components/workflow-shell"
 import { getWorkflowFn } from "@/features/workflows/data"
 
 export const Route = createFileRoute("/_dashboard/workflows/$id")({
@@ -51,7 +49,8 @@ function WorkflowError({ error }: ErrorComponentProps) {
             Something went wrong
           </EmptyTitle>
           <EmptyDescription>
-            {error.message || "Failed to load this workflow. Please try again."}
+            {error.message ||
+              "Failed to load this workflow. Please try again."}
           </EmptyDescription>
         </EmptyHeader>
       </Empty>
@@ -71,7 +70,8 @@ function WorkflowNotFound() {
             Workflow not found
           </EmptyTitle>
           <EmptyDescription>
-            This workflow does not exist or you do not have access to it.
+            This workflow does not exist or you do not have access to
+            it.
           </EmptyDescription>
         </EmptyHeader>
       </Empty>
@@ -82,11 +82,5 @@ function WorkflowNotFound() {
 function WorkflowPage() {
   const { workflow } = Route.useLoaderData()
 
-  return (
-    <div className="flex min-h-svh flex-col p-6">
-      <h1 className="font-heading text-lg font-semibold tracking-tight">
-        {workflow.name}
-      </h1>
-    </div>
-  )
+  return <WorkflowShell workflowId={workflow.id} />
 }
