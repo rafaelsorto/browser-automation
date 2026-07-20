@@ -14,7 +14,9 @@ import type {
   OnNodesChange,
   OnEdgesChange,
   OnConnect,
+  ColorMode,
 } from "@xyflow/react"
+import { useTheme } from "next-themes"
 import "@xyflow/react/dist/style.css"
 
 const initialNodes: Node[] = [
@@ -27,6 +29,12 @@ const initialEdges: Edge[] = [
 ]
 
 export function Canvas() {
+  const { theme } = useTheme()
+  const colorMode: ColorMode =
+    theme === "light" || theme === "dark" || theme === "system"
+      ? theme
+      : "system"
+
   const [nodes, setNodes] = useState(initialNodes)
   const [edges, setEdges] = useState(initialEdges)
 
@@ -58,6 +66,7 @@ export function Canvas() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        colorMode={colorMode}
         fitView
         connectionLineType={ConnectionLineType.SmoothStep}
         connectionLineStyle={{ stroke: "var(--border)" }}
