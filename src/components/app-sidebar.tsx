@@ -7,6 +7,7 @@ import { useServerFn } from "@tanstack/react-start"
 import { PlusIcon, WorkflowIcon } from "lucide-react"
 import type { ComponentProps } from "react"
 
+import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 import {
   Popover,
@@ -164,7 +165,7 @@ export function AppSidebar({
       </SidebarContent>
 
       <SidebarFooter>
-        <div className="flex items-center group-data-[collapsible=icon]:justify-center">
+        <div className="flex items-center justify-between gap-1 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:justify-center">
           <UserButton
             appearance={{
               elements: {
@@ -174,6 +175,7 @@ export function AppSidebar({
               },
             }}
           />
+          <ThemeToggle />
         </div>
       </SidebarFooter>
     </Sidebar>
