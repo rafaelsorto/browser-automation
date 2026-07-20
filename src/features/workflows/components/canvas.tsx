@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import {
   ReactFlow,
   Background,
@@ -29,11 +29,17 @@ const initialEdges: Edge[] = [
 ]
 
 export function Canvas() {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Keep SSR and the first client render on the same colorMode so React Flow
+  // doesn't hydrate with a different light/dark class than the server HTML.
   const colorMode: ColorMode =
-    theme === "light" || theme === "dark" || theme === "system"
-      ? theme
-      : "system"
+    mounted && resolvedTheme === "dark" ? "dark" : "light"
 
   const [nodes, setNodes] = useState(initialNodes)
   const [edges, setEdges] = useState(initialEdges)
