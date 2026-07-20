@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "trigger": {
+      "args": [
+        "trigger.dev@latest",
+        "mcp",
+        "--dev-only",
+        "--project-ref",
+        "proj_xahdwjxmrnrkmzosgbql"
+      ],
+      "command": "/home/rafael/.nvm/versions/node/v24.15.0/bin/npx"
+    }
+  }
+}
