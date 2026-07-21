@@ -58,7 +58,7 @@ export function Canvas() {
   const [nodes, setNodes] = useState(initialNodes)
   const [edges, setEdges] = useState(initialEdges)
 
-  const onNodesChange: OnNodesChange = useCallback(
+  const onNodesChange: OnNodesChange<StepNodeType> = useCallback(
     (changes) =>
       setNodes((nodesSnapshot) =>
         applyNodeChanges(changes, nodesSnapshot)
