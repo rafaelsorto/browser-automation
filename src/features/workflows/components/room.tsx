@@ -15,9 +15,7 @@ export function Room({
   return (
     <LiveblocksProvider
       throttle={16}
-      publicApiKey={
-        "pk_dev_D43pSoKUSBc5NO1DTZ4lwOiDqwacV4V_iMYAf24ta_smcfEEG9ZueYmQ8l79sRG-"
-      }
+      publicApiKey={import.meta.env.VITE_LIVEBLOCKS_PUBLIC_API_KEY}
     >
       <RoomProvider id={id}>
         <ClientSideSuspense fallback={<div>Loading…</div>}>
