@@ -23,6 +23,7 @@
     "@clerk/ui": "^1.25.4",
     "@fontsource-variable/geist": "^5.2.9",
     "@liveblocks/client": "^3.22.0",
+    "@liveblocks/node": "^3.22.0",
     "@liveblocks/react": "^3.22.0",
     "@liveblocks/react-flow": "^3.22.0",
     "@liveblocks/react-ui": "^3.22.0",

@@ -16,7 +16,7 @@ export function Room({
   return (
     <LiveblocksProvider
       throttle={16}
-      publicApiKey={import.meta.env.VITE_LIVEBLOCKS_PUBLIC_API_KEY}
+      authEndpoint={"/api/auth/liveblocks"}
     >
       <RoomProvider id={id}>
         <ClientSideSuspense

@@ -13,6 +13,7 @@ import { Route as TestRouteImport } from './routes/test'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
 import { Route as SessionTasksChooseOrganizationRouteImport } from './routes/session-tasks/choose-organization'
+import { Route as ApiAuthLiveblocksRouteImport } from './routes/api.auth.liveblocks'
 import { Route as DashboardWorkflowsIdRouteImport } from './routes/_dashboard/workflows/$id'
 import { Route as AuthSignUpSplatRouteImport } from './routes/_auth/sign-up.$'
 import { Route as AuthSignInSplatRouteImport } from './routes/_auth/sign-in.$'
@@ -37,6 +38,11 @@ const SessionTasksChooseOrganizationRoute =
     path: '/session-tasks/choose-organization',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiAuthLiveblocksRoute = ApiAuthLiveblocksRouteImport.update({
+  id: '/api/auth/liveblocks',
+  path: '/api/auth/liveblocks',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardWorkflowsIdRoute = DashboardWorkflowsIdRouteImport.update({
   id: '/workflows/$id',
   path: '/workflows/$id',
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/sign-in/$': typeof AuthSignInSplatRoute
   '/sign-up/$': typeof AuthSignUpSplatRoute
   '/workflows/$id': typeof DashboardWorkflowsIdRoute
+  '/api/auth/liveblocks': typeof ApiAuthLiveblocksRoute
 }
 export interface FileRoutesByTo {
   '/test': typeof TestRoute
@@ -68,6 +75,7 @@ export interface FileRoutesByTo {
   '/sign-in/$': typeof AuthSignInSplatRoute
   '/sign-up/$': typeof AuthSignUpSplatRoute
   '/workflows/$id': typeof DashboardWorkflowsIdRoute
+  '/api/auth/liveblocks': typeof ApiAuthLiveblocksRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -78,6 +86,7 @@ export interface FileRoutesById {
   '/_auth/sign-in/$': typeof AuthSignInSplatRoute
   '/_auth/sign-up/$': typeof AuthSignUpSplatRoute
   '/_dashboard/workflows/$id': typeof DashboardWorkflowsIdRoute
+  '/api/auth/liveblocks': typeof ApiAuthLiveblocksRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/sign-in/$'
     | '/sign-up/$'
     | '/workflows/$id'
+    | '/api/auth/liveblocks'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/test'
@@ -96,6 +106,7 @@ export interface FileRouteTypes {
     | '/sign-in/$'
     | '/sign-up/$'
     | '/workflows/$id'
+    | '/api/auth/liveblocks'
   id:
     | '__root__'
     | '/_dashboard'
@@ -105,6 +116,7 @@ export interface FileRouteTypes {
     | '/_auth/sign-in/$'
     | '/_auth/sign-up/$'
     | '/_dashboard/workflows/$id'
+    | '/api/auth/liveblocks'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -113,6 +125,7 @@ export interface RootRouteChildren {
   SessionTasksChooseOrganizationRoute: typeof SessionTasksChooseOrganizationRoute
   AuthSignInSplatRoute: typeof AuthSignInSplatRoute
   AuthSignUpSplatRoute: typeof AuthSignUpSplatRoute
+  ApiAuthLiveblocksRoute: typeof ApiAuthLiveblocksRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -143,6 +156,13 @@ declare module '@tanstack/react-router' {
       path: '/session-tasks/choose-organization'
       fullPath: '/session-tasks/choose-organization'
       preLoaderRoute: typeof SessionTasksChooseOrganizationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/liveblocks': {
+      id: '/api/auth/liveblocks'
+      path: '/api/auth/liveblocks'
+      fullPath: '/api/auth/liveblocks'
+      preLoaderRoute: typeof ApiAuthLiveblocksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_dashboard/workflows/$id': {
@@ -189,6 +209,7 @@ const rootRouteChildren: RootRouteChildren = {
   SessionTasksChooseOrganizationRoute: SessionTasksChooseOrganizationRoute,
   AuthSignInSplatRoute: AuthSignInSplatRoute,
   AuthSignUpSplatRoute: AuthSignUpSplatRoute,
+  ApiAuthLiveblocksRoute: ApiAuthLiveblocksRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
