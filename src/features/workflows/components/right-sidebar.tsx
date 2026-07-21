@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useServerFn } from "@tanstack/react-start"
 import { useRealtimeRun } from "@trigger.dev/react-hooks"
-import { useReactFlow, useStoreApi } from "@xyflow/react"
+import { useReactFlow, useStore, useStoreApi } from "@xyflow/react"
 import { MoreHorizontal, Play, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -22,7 +22,12 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
 import { runWorkflowFn } from "@/features/workflows/data"
 import { nodeRegistry } from "@/features/workflows/nodes/node-registry"
 import { cn } from "@/lib/utils"
@@ -84,7 +89,13 @@ function statusVariant(status: string) {
 // ---------------------------------------------------------------------------
 
 // The accent-colored icon chip, mirroring the node on the canvas.
-function NodeIcon({ type, className }: { type: NodeType; className?: string }) {
+function NodeIcon({
+  type,
+  className,
+}: {
+  type: NodeType
+  className?: string
+}) {
   const def = nodeRegistry[type]
   const Icon = def.icon
   return (
@@ -151,7 +162,9 @@ function Inspector({ node }: { node: StepNodeType | undefined }) {
   if (!node) {
     return (
       <Section title="Editor">
-        <p className="p-3 text-sm text-muted-foreground">No node selected</p>
+        <p className="p-3 text-sm text-muted-foreground">
+          No node selected
+        </p>
       </Section>
     )
   }
@@ -163,7 +176,9 @@ function Inspector({ node }: { node: StepNodeType | undefined }) {
     <Section title={title} icon={<NodeIcon type={type} />}>
       <div className="flex flex-col gap-3 p-3">
         {def.fields.length === 0 ? (
-          <p className="text-xs text-muted-foreground">No properties</p>
+          <p className="text-xs text-muted-foreground">
+            No properties
+          </p>
         ) : (
           def.fields.map((field) => (
             <div key={field.key} className="flex flex-col gap-1.5">
@@ -225,7 +240,9 @@ function Palette() {
         })
       : { x: 0, y: 0 }
 
-    const count = nodes.filter((node) => node.data.type === type).length
+    const count = nodes.filter(
+      (node) => node.data.type === type
+    ).length
 
     addNodes({
       id: crypto.randomUUID(),
@@ -312,13 +329,18 @@ function RunButton({ workflowId }: { workflowId: string }) {
   const runWorkflow = useServerFn(runWorkflowFn)
   const [handle, setHandle] = useState<RunHandle | null>(null)
   const [isTriggering, setIsTriggering] = useState(false)
-  const [triggerError, setTriggerError] = useState<string | null>(null)
+  const [triggerError, setTriggerError] = useState<string | null>(
+    null
+  )
 
-  const { run, error } = useRealtimeRun<typeof helloWorldTask>(handle?.id, {
-    accessToken: handle?.publicAccessToken,
-    enabled: !!handle,
-    skipColumns: ["payload", "output"],
-  })
+  const { run, error } = useRealtimeRun<typeof helloWorldTask>(
+    handle?.id,
+    {
+      accessToken: handle?.publicAccessToken,
+      enabled: !!handle,
+      skipColumns: ["payload", "output"],
+    }
+  )
 
   const isRunning = !!run && ACTIVE_STATUSES.has(run.status)
 
@@ -360,7 +382,11 @@ function RunButton({ workflowId }: { workflowId: string }) {
           ) : (
             <Play fill="primary" />
           )}
-          {isTriggering ? "Starting…" : isRunning ? "Running…" : "Run"}
+          {isTriggering
+            ? "Starting…"
+            : isRunning
+              ? "Running…"
+              : "Run"}
         </Button>
       </div>
       {triggerError ? (
@@ -384,13 +410,18 @@ function RunButton({ workflowId }: { workflowId: string }) {
 export function RightSidebar({ workflowId }: { workflowId: string }) {
   const [tab, setTab] = useState("toolbar")
 
-  // TODO: read the currently selected node from React Flow.
-  const selected: StepNodeType | undefined = undefined
+  const selected = useStore((s) =>
+    s.nodes.find((node) => node.selected)
+  ) as StepNodeType | undefined
 
   // TODO: auto-switch to the Editor tab when the selection changes.
 
   return (
-    <Tabs value={tab} onValueChange={setTab} className="size-full gap-0">
+    <Tabs
+      value={tab}
+      onValueChange={setTab}
+      className="size-full gap-0"
+    >
       <div className="flex items-center justify-between border-b border-border p-2">
         <ActionsMenu />
         <RunButton workflowId={workflowId} />
