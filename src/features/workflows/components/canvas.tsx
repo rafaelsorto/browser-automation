@@ -1,23 +1,16 @@
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import {
   ReactFlow,
   Background,
   Controls,
-  applyNodeChanges,
-  applyEdgeChanges,
-  addEdge,
   ConnectionLineType,
 } from "@xyflow/react"
-import type {
-  Edge,
-  OnNodesChange,
-  OnEdgesChange,
-  OnConnect,
-  ColorMode,
-  NodeTypes,
-} from "@xyflow/react"
+import type { Edge, ColorMode, NodeTypes } from "@xyflow/react"
+import { Cursors, useLiveblocksFlow } from "@liveblocks/react-flow"
 import { useTheme } from "next-themes"
 import "@xyflow/react/dist/style.css"
+import "@liveblocks/react-flow/styles.css"
+import "@liveblocks/react-ui/styles.css"
 
 import { StepNode } from "@/features/workflows/components/step-node"
 import type { StepNodeType } from "@/features/workflows/nodes/node-registry"
@@ -55,28 +48,22 @@ export function Canvas() {
   const colorMode: ColorMode =
     mounted && resolvedTheme === "dark" ? "dark" : "light"
 
-  const [nodes, setNodes] = useState(initialNodes)
-  const [edges, setEdges] = useState(initialEdges)
-
-  const onNodesChange: OnNodesChange<StepNodeType> = useCallback(
-    (changes) =>
-      setNodes((nodesSnapshot) =>
-        applyNodeChanges(changes, nodesSnapshot)
-      ),
-    []
-  )
-  const onEdgesChange: OnEdgesChange = useCallback(
-    (changes) =>
-      setEdges((edgesSnapshot) =>
-        applyEdgeChanges(changes, edgesSnapshot)
-      ),
-    []
-  )
-  const onConnect: OnConnect = useCallback(
-    (params) =>
-      setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
-    []
-  )
+  const {
+    nodes,
+    edges,
+    onNodesChange,
+    onEdgesChange,
+    onConnect,
+    onDelete,
+  } = useLiveblocksFlow({
+    suspense: true,
+    nodes: {
+      initial: initialNodes,
+    },
+    edges: {
+      initial: initialEdges,
+    },
+  })
 
   return (
     <div className="size-full">
@@ -87,6 +74,7 @@ export function Canvas() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onDelete={onDelete}
         colorMode={colorMode}
         fitView
         connectionLineType={ConnectionLineType.SmoothStep}
@@ -106,6 +94,7 @@ export function Canvas() {
       >
         <Background />
         <Controls />
+        <Cursors />
       </ReactFlow>
     </div>
   )
