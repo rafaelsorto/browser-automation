@@ -23,7 +23,7 @@ function WorkflowDeletedListener() {
   const leave = (message: string) => {
     if (handled.current) return
     handled.current = true
-    toast.error(message)
+    toast.info(message)
     void navigate({ to: "/" }).then(() => router.invalidate())
   }
 
@@ -35,13 +35,13 @@ function WorkflowDeletedListener() {
       handled.current = true
       return
     }
-    leave("This workflow was deleted")
+    leave("This workflow was deleted by someone else")
   })
 
   useErrorListener((error) => {
     if (error.context.type !== "ROOM_CONNECTION_ERROR") return
     // Fallback when the room is deleted before the broadcast is received.
-    leave("This workflow is no longer available")
+    leave("This workflow was deleted by someone else")
   })
 
   return null

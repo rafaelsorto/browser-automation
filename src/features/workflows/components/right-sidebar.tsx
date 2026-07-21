@@ -335,6 +335,7 @@ function ActionsMenu({ workflowId }: { workflowId: string }) {
 
     try {
       await deleteWorkflow({ data: { workflowId } })
+      toast.success("Workflow deleted")
       await router.invalidate()
     } catch (err) {
       setIsDeleting(false)
