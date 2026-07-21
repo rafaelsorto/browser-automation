@@ -14,6 +14,7 @@ import {
   serializeWorkflows,
 } from "@/features/workflows/lib/serialize-workflow"
 import {
+  broadcastWorkflowDeleted,
   deleteWorkflowRoom,
   ensureWorkflowRoom,
 } from "@/lib/liveblocks.server"
@@ -86,10 +87,14 @@ export const runWorkflowFn = createServerFn({ method: "POST" })
 export const deleteWorkflowFn = createServerFn({ method: "POST" })
   .validator((data: { workflowId: string }) => data)
   .handler(async ({ data }) => {
-    const { orgId } = await auth()
+    const { orgId, userId } = await auth()
 
     if (!orgId) {
       throw new Error("No active organization")
+    }
+
+    if (!userId) {
+      throw new Error("Not authenticated")
     }
 
     const workflow = await deleteWorkflow(orgId, data.workflowId)
@@ -98,6 +103,8 @@ export const deleteWorkflowFn = createServerFn({ method: "POST" })
       throw new Error("Workflow not found")
     }
 
+    // Notify connected collaborators before tearing the room down.
+    await broadcastWorkflowDeleted(workflow.id, userId)
     await deleteWorkflowRoom(workflow.id)
 
     throw redirect({

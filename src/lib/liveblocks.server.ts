@@ -35,6 +35,35 @@ export async function ensureWorkflowRoom(
   }
 }
 
+export async function broadcastWorkflowDeleted(
+  roomId: string,
+  deletedBy: string
+) {
+  try {
+    await liveblocks.broadcastEvent(roomId, {
+      type: "WORKFLOW_DELETED",
+      workflowId: roomId,
+      deletedBy,
+    })
+  } catch (error) {
+    if (error instanceof LiveblocksError) {
+      // Room may never have been created — nothing to notify.
+      if (error.status === 404) {
+        return
+      }
+      console.error(
+        `Error broadcasting workflow deleted: ${error.status} - ${error.message}`
+      )
+    } else {
+      console.error(
+        `Unexpected error broadcasting workflow deleted:`,
+        error
+      )
+    }
+    throw error
+  }
+}
+
 export async function deleteWorkflowRoom(roomId: string) {
   try {
     await liveblocks.deleteRoom(roomId)

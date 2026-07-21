@@ -9,6 +9,13 @@ declare global {
         avatar: string
       }
     }
+
+    // Custom events broadcast to the workflow room
+    RoomEvent: {
+      type: "WORKFLOW_DELETED"
+      workflowId: string
+      deletedBy: string
+    }
   }
 }
 
