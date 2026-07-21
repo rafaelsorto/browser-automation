@@ -4,10 +4,12 @@ import {
   Background,
   Controls,
   ConnectionLineType,
+  Panel,
 } from "@xyflow/react"
 import type { Edge, ColorMode, NodeTypes } from "@xyflow/react"
 import { Cursors, useLiveblocksFlow } from "@liveblocks/react-flow"
 import { useTheme } from "next-themes"
+import { AvatarStack } from "@liveblocks/react-ui"
 import "@xyflow/react/dist/style.css"
 import "@liveblocks/react-flow/styles.css"
 import "@liveblocks/react-ui/styles.css"
@@ -95,6 +97,9 @@ export function Canvas() {
         <Background />
         <Controls />
         <Cursors />
+        <Panel position="top-right">
+          <AvatarStack />
+        </Panel>
       </ReactFlow>
     </div>
   )
