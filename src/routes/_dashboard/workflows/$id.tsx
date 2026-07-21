@@ -24,6 +24,7 @@ export const Route = createFileRoute("/_dashboard/workflows/$id")({
 
     return { workflow }
   },
+  pendingMs: 0,
   pendingComponent: WorkflowPending,
   errorComponent: WorkflowError,
   notFoundComponent: WorkflowNotFound,
