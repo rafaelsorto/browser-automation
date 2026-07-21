@@ -2,7 +2,7 @@ import {
   OrganizationSwitcher,
   UserButton,
 } from "@clerk/tanstack-react-start"
-import { Link, useMatchRoute } from "@tanstack/react-router"
+import { Link, useMatchRoute, useRouter } from "@tanstack/react-router"
 import { useServerFn } from "@tanstack/react-start"
 import { PlusIcon, WorkflowIcon } from "lucide-react"
 import type { ComponentProps } from "react"
@@ -42,10 +42,13 @@ function WorkflowNav({
 }) {
   const { state, isMobile } = useSidebar()
   const matchRoute = useMatchRoute()
+  const router = useRouter()
   const createWorkflow = useServerFn(createWorkflowFn)
 
   const handleCreateWorkflow = () => {
-    void createWorkflow({ data: { name: generateSlug() } })
+    void createWorkflow({ data: { name: generateSlug() } }).then(() =>
+      router.invalidate(),
+    )
   }
 
   if (state === "collapsed" && !isMobile) {
