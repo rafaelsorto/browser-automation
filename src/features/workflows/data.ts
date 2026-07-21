@@ -12,6 +12,7 @@ import {
   serializeWorkflow,
   serializeWorkflows,
 } from "@/features/workflows/lib/serialize-workflow"
+import { ensureWorkflowRoom } from "@/lib/liveblocks.server"
 import type { helloWorldTask } from "@/trigger/example"
 
 export const listWorkflowsFn = createServerFn().handler(async () => {
@@ -30,7 +31,13 @@ export const getWorkflowFn = createServerFn()
     }
 
     const workflow = await getWorkflow(orgId, data.id)
-    return workflow ? serializeWorkflow(workflow) : null
+
+    if (!workflow) {
+      return null
+    }
+
+    await ensureWorkflowRoom(workflow.id, orgId, workflow.name)
+    return serializeWorkflow(workflow)
   })
 
 export const createWorkflowFn = createServerFn({ method: "POST" })
@@ -43,6 +50,7 @@ export const createWorkflowFn = createServerFn({ method: "POST" })
     }
 
     const workflow = await createWorkflow(orgId, data.name)
+    await ensureWorkflowRoom(workflow.id, orgId, workflow.name)
 
     throw redirect({
       href: `/workflows/${workflow.id}`,

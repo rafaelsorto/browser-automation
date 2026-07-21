@@ -5,6 +5,7 @@ import {
   ClientSideSuspense,
 } from "@liveblocks/react/suspense"
 import { Spinner } from "@/components/ui/spinner"
+import { resolveLiveblocksUsersFn } from "@/features/workflows/liveblocks"
 
 export function Room({
   id,
@@ -16,7 +17,10 @@ export function Room({
   return (
     <LiveblocksProvider
       throttle={16}
-      authEndpoint={"/api/auth/liveblocks"}
+      authEndpoint="/api/auth/liveblocks"
+      resolveUsers={async ({ userIds }) =>
+        resolveLiveblocksUsersFn({ data: { userIds } })
+      }
     >
       <RoomProvider id={id}>
         <ClientSideSuspense

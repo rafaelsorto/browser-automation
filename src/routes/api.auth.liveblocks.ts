@@ -1,10 +1,7 @@
 import { auth, clerkClient } from "@clerk/tanstack-react-start/server"
-import { Liveblocks } from "@liveblocks/node"
 import { createFileRoute } from "@tanstack/react-router"
 
-const liveblocks = new Liveblocks({
-  secret: process.env.LIVEBLOCKS_SECRET_KEY!,
-})
+import { liveblocks } from "@/lib/liveblocks.server"
 
 export const Route = createFileRoute("/api/auth/liveblocks")({
   server: {
@@ -12,7 +9,7 @@ export const Route = createFileRoute("/api/auth/liveblocks")({
       POST: async () => {
         const { userId, orgId } = await auth()
 
-        if (!userId) {
+        if (!userId || !orgId) {
           return new Response("Unauthorized", { status: 401 })
         }
 
@@ -21,7 +18,8 @@ export const Route = createFileRoute("/api/auth/liveblocks")({
         const { status, body } = await liveblocks.identifyUser(
           {
             userId: user.id,
-            groupIds: orgId ? [orgId] : [],
+            groupIds: [orgId],
+            organizationId: orgId,
           },
           {
             userInfo: {
@@ -32,7 +30,7 @@ export const Route = createFileRoute("/api/auth/liveblocks")({
                 "Anonymous",
               avatar: user.imageUrl,
             },
-          },
+          }
         )
 
         return new Response(body, { status })
