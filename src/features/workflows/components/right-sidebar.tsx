@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useRouter } from "@tanstack/react-router"
 import { useServerFn } from "@tanstack/react-start"
 import { useRealtimeRun } from "@trigger.dev/react-hooks"
 import { useReactFlow, useStore, useStoreApi } from "@xyflow/react"
@@ -29,7 +30,10 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import { runWorkflowFn } from "@/features/workflows/data"
+import {
+  deleteWorkflowFn,
+  runWorkflowFn,
+} from "@/features/workflows/data"
 import { nodeRegistry } from "@/features/workflows/nodes/node-registry"
 import { cn } from "@/lib/utils"
 
@@ -321,24 +325,44 @@ function Palette() {
 // ---------------------------------------------------------------------------
 
 // The "..." menu for workflow-level actions.
-function ActionsMenu() {
+function ActionsMenu({ workflowId }: { workflowId: string }) {
+  const router = useRouter()
+  const deleteWorkflow = useServerFn(deleteWorkflowFn)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const handleDelete = async () => {
+    setIsDeleting(true)
+
+    try {
+      await deleteWorkflow({ data: { workflowId } })
+      await router.invalidate()
+    } catch (err) {
+      setIsDeleting(false)
+      toast.error(
+        err instanceof Error ? err.message : "Failed to delete workflow"
+      )
+    }
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size="icon" variant="ghost">
+        <Button size="icon" variant="ghost" disabled={isDeleting}>
           <MoreHorizontal />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="min-w-48">
         <DropdownMenuItem
           variant="destructive"
+          disabled={isDeleting}
           className="text-xs [&_svg:not([class*='size-'])]:size-3.5"
-          onSelect={() => {
-            // TODO: delete the workflow, then navigate away.
+          onSelect={(e) => {
+            e.preventDefault()
+            void handleDelete()
           }}
         >
           <Trash2 />
-          Delete workflow
+          {isDeleting ? "Deleting…" : "Delete workflow"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -453,7 +477,7 @@ export function RightSidebar({ workflowId }: { workflowId: string }) {
       className="size-full gap-0"
     >
       <div className="flex items-center justify-between border-b border-border p-2">
-        <ActionsMenu />
+        <ActionsMenu workflowId={workflowId} />
         <RunButton workflowId={workflowId} />
       </div>
       <TabsList className="m-2 w-fit bg-background">

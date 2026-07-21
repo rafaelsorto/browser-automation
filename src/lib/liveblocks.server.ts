@@ -34,3 +34,22 @@ export async function ensureWorkflowRoom(
     throw error
   }
 }
+
+export async function deleteWorkflowRoom(roomId: string) {
+  try {
+    await liveblocks.deleteRoom(roomId)
+  } catch (error) {
+    if (error instanceof LiveblocksError) {
+      // Room may never have been created, or was already removed.
+      if (error.status === 404) {
+        return
+      }
+      console.error(
+        `Error deleting room: ${error.status} - ${error.message}`
+      )
+    } else {
+      console.error(`Unexpected error deleting Liveblocks room:`, error)
+    }
+    throw error
+  }
+}

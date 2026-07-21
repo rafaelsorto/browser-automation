@@ -5,6 +5,7 @@ import { tasks } from "@trigger.dev/sdk"
 
 import {
   createWorkflow,
+  deleteWorkflow,
   getWorkflow,
   listWorkflows,
 } from "@/features/workflows/data.server"
@@ -12,7 +13,10 @@ import {
   serializeWorkflow,
   serializeWorkflows,
 } from "@/features/workflows/lib/serialize-workflow"
-import { ensureWorkflowRoom } from "@/lib/liveblocks.server"
+import {
+  deleteWorkflowRoom,
+  ensureWorkflowRoom,
+} from "@/lib/liveblocks.server"
 import type { helloWorldTask } from "@/trigger/example"
 
 export const listWorkflowsFn = createServerFn().handler(async () => {
@@ -77,4 +81,26 @@ export const runWorkflowFn = createServerFn({ method: "POST" })
     })
 
     return handle
+  })
+
+export const deleteWorkflowFn = createServerFn({ method: "POST" })
+  .validator((data: { workflowId: string }) => data)
+  .handler(async ({ data }) => {
+    const { orgId } = await auth()
+
+    if (!orgId) {
+      throw new Error("No active organization")
+    }
+
+    const workflow = await deleteWorkflow(orgId, data.workflowId)
+
+    if (!workflow) {
+      throw new Error("Workflow not found")
+    }
+
+    await deleteWorkflowRoom(workflow.id)
+
+    throw redirect({
+      href: "/",
+    })
   })
