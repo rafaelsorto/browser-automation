@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
+import { Textarea } from "@/components/ui/textarea"
 import {
   Tabs,
   TabsContent,
@@ -136,8 +137,8 @@ function Section({
 // Editor tab — edits the fields of the selected node.
 // ---------------------------------------------------------------------------
 
-// A single editor field for a node property.
-function FieldInput({
+// A single editor field for a node property — input or textarea based on the field flag.
+function Field({
   field,
   value,
   onChange,
@@ -146,14 +147,32 @@ function FieldInput({
   value: string
   onChange: (value: string) => void
 }) {
-  // TODO: support a multiline field variant (textarea).
-  return (
+  const control = field.multiline ? (
+    <Textarea
+      id={field.key}
+      value={value}
+      placeholder={field.placeholder}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  ) : (
     <Input
       id={field.key}
       value={value}
       placeholder={field.placeholder}
       onChange={(e) => onChange(e.target.value)}
     />
+  )
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <Label htmlFor={field.key} className="text-xs">
+        {field.label}
+        {field.required && (
+          <span className="text-destructive">*</span>
+        )}
+      </Label>
+      {control}
+    </div>
   )
 }
 
@@ -183,23 +202,19 @@ function Inspector({ node }: { node: StepNodeType | undefined }) {
           </p>
         ) : (
           def.fields.map((field) => (
-            <div key={field.key} className="flex flex-col gap-1.5">
-              <Label htmlFor={field.key} className="text-xs">
-                {field.label}
-              </Label>
-              <FieldInput
-                field={field}
-                value={values[field.key] ?? ""}
-                onChange={(value) => {
-                  updateNodeData(node.id, {
-                    values: {
-                      ...values,
-                      [field.key]: value,
-                    },
-                  })
-                }}
-              />
-            </div>
+            <Field
+              key={field.key}
+              field={field}
+              value={values[field.key] ?? ""}
+              onChange={(value) => {
+                updateNodeData(node.id, {
+                  values: {
+                    ...values,
+                    [field.key]: value,
+                  },
+                })
+              }}
+            />
           ))
         )}
       </div>

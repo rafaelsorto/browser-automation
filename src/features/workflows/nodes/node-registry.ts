@@ -9,6 +9,9 @@ export type NodeField = {
   key: string
   label: string
   placeholder?: string
+  /** When true, the inspector renders a multi-line textarea instead of a single-line input. */
+  multiline?: boolean
+  required?: boolean
 }
 
 // A node type's manifest entry. Add a node by adding an entry to nodeRegistry.
@@ -41,6 +44,7 @@ export const nodeRegistry = {
         key: "url",
         label: "URL",
         placeholder: "https://youtube.com",
+        required: true,
       },
     ],
   },
