@@ -12,6 +12,7 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { WorkflowShell } from "@/features/workflows/components/workflow-shell"
 import { getWorkflowFn } from "@/features/workflows/data"
+import { Room } from "@/features/workflows/components/room"
 
 export const Route = createFileRoute("/_dashboard/workflows/$id")({
   loader: async ({ params }) => {
@@ -82,5 +83,9 @@ function WorkflowNotFound() {
 function WorkflowPage() {
   const { workflow } = Route.useLoaderData()
 
-  return <WorkflowShell workflowId={workflow.id} />
+  return (
+    <Room id={workflow.id}>
+      <WorkflowShell workflowId={workflow.id} />
+    </Room>
+  )
 }
