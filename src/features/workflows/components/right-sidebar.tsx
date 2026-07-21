@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useServerFn } from "@tanstack/react-start"
 import { useRealtimeRun } from "@trigger.dev/react-hooks"
 import { useReactFlow, useStore, useStoreApi } from "@xyflow/react"
@@ -159,6 +159,8 @@ function FieldInput({
 
 // The Editor tab: one input per field on the selected node, or an empty state.
 function Inspector({ node }: { node: StepNodeType | undefined }) {
+  const { updateNodeData } = useReactFlow<StepNodeType>()
+
   if (!node) {
     return (
       <Section title="Editor">
@@ -189,8 +191,12 @@ function Inspector({ node }: { node: StepNodeType | undefined }) {
                 field={field}
                 value={values[field.key] ?? ""}
                 onChange={(value) => {
-                  // TODO: save the edit back onto the selected node.
-                  void value
+                  updateNodeData(node.id, {
+                    values: {
+                      ...values,
+                      [field.key]: value,
+                    },
+                  })
                 }}
               />
             </div>
@@ -414,7 +420,16 @@ export function RightSidebar({ workflowId }: { workflowId: string }) {
     s.nodes.find((node) => node.selected)
   ) as StepNodeType | undefined
 
-  // TODO: auto-switch to the Editor tab when the selection changes.
+  const [prevSelected, setPrevSelected] = useState<
+    string | undefined
+  >(selected?.id)
+
+  useEffect(() => {
+    if (selected?.id !== prevSelected) {
+      setPrevSelected(selected?.id)
+      setTab("editor")
+    }
+  }, [selected?.id])
 
   return (
     <Tabs
