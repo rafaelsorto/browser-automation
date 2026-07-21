@@ -1,5 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router"
 import type { ErrorComponentProps } from "@tanstack/react-router"
+import { ReactFlowProvider } from "@xyflow/react"
 import { AlertCircleIcon, SearchXIcon } from "lucide-react"
 
 import {
@@ -86,7 +87,9 @@ function WorkflowPage() {
 
   return (
     <Room id={workflow.id}>
-      <WorkflowShell workflowId={workflow.id} />
+      <ReactFlowProvider>
+        <WorkflowShell workflowId={workflow.id} />
+      </ReactFlowProvider>
     </Room>
   )
 }
