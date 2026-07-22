@@ -46,6 +46,7 @@ import type {
   StepNodeType,
 } from "@/features/workflows/nodes/node-registry"
 import type { helloWorldTask } from "@/trigger/example"
+import type { WorkflowGraph } from "@/db/schema"
 
 // This file builds up to the RightSidebar component exported at the bottom: a
 // header with workflow actions (delete, run), then two tabs — a Toolbar for
@@ -340,7 +341,9 @@ function ActionsMenu({ workflowId }: { workflowId: string }) {
     } catch (err) {
       setIsDeleting(false)
       toast.error(
-        err instanceof Error ? err.message : "Failed to delete workflow"
+        err instanceof Error
+          ? err.message
+          : "Failed to delete workflow"
       )
     }
   }
@@ -372,6 +375,7 @@ function ActionsMenu({ workflowId }: { workflowId: string }) {
 
 // Kicks off a run of the current workflow via Trigger.dev.
 function RunButton({ workflowId }: { workflowId: string }) {
+  const { getNodes, getEdges } = useReactFlow<StepNodeType>()
   const runWorkflow = useServerFn(runWorkflowFn)
   const [handle, setHandle] = useState<RunHandle | null>(null)
   const [isTriggering, setIsTriggering] = useState(false)
@@ -395,7 +399,14 @@ function RunButton({ workflowId }: { workflowId: string }) {
     setTriggerError(null)
 
     try {
-      const result = await runWorkflow({ data: { workflowId } })
+      const graph = {
+        nodes: getNodes(),
+        edges: getEdges(),
+      } as WorkflowGraph
+
+      const result = await runWorkflow({
+        data: { workflowId, graph },
+      })
       setHandle({
         id: result.id,
         publicAccessToken: result.publicAccessToken,

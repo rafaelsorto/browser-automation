@@ -1,13 +1,14 @@
 import { auth } from "@clerk/tanstack-react-start/server"
 import { redirect } from "@tanstack/react-router"
 import { createServerFn } from "@tanstack/react-start"
-import { tasks } from "@trigger.dev/sdk"
+import { tasks, runs } from "@trigger.dev/sdk"
 
 import {
   createWorkflow,
   deleteWorkflow,
   getWorkflow,
   listWorkflows,
+  updateWorkflow,
 } from "@/features/workflows/data.server"
 import {
   serializeWorkflow,
@@ -19,6 +20,42 @@ import {
   ensureWorkflowRoom,
 } from "@/lib/liveblocks.server"
 import type { helloWorldTask } from "@/trigger/example"
+
+import { validateGraph } from "@/features/workflows/lib/validate-graph"
+
+import type { StepNodeType } from "./nodes/node-registry"
+import type { Edge } from "@xyflow/react"
+import type { WorkflowGraph } from "@/db/schema"
+
+export const saveWorkflowGraphFn = createServerFn({
+  method: "POST",
+})
+  .validator((data: { id: string; graph: WorkflowGraph }) => data)
+  .handler(async ({ data }) => {
+    const { orgId } = await auth()
+
+    if (!orgId) {
+      throw new Error("No active organization")
+    }
+
+    const problems = validateGraph(data.graph)
+
+    if (problems.length > 0) {
+      throw new Error(problems.join("\n"))
+    }
+
+    const workflow = await updateWorkflow({
+      orgId,
+      id: data.id,
+      graph: data.graph,
+    })
+
+    if (!workflow) {
+      throw new Error("Workflow not found")
+    }
+
+    return serializeWorkflow(workflow)
+  })
 
 export const listWorkflowsFn = createServerFn().handler(async () => {
   const { orgId } = await auth()
@@ -62,8 +99,12 @@ export const createWorkflowFn = createServerFn({ method: "POST" })
     })
   })
 
-export const runWorkflowFn = createServerFn({ method: "POST" })
-  .validator((data: { workflowId: string }) => data)
+export const runWorkflowFn = createServerFn({
+  method: "POST",
+})
+  .validator(
+    (data: { workflowId: string; graph: WorkflowGraph }) => data
+  )
   .handler(async ({ data }) => {
     const { orgId } = await auth()
 
@@ -77,9 +118,16 @@ export const runWorkflowFn = createServerFn({ method: "POST" })
       throw new Error("Workflow not found")
     }
 
-    const handle = await tasks.trigger<typeof helloWorldTask>("hello-world", {
-      message: `Run workflow ${workflow.id}`,
+    await saveWorkflowGraphFn({
+      data: { id: workflow.id, graph: data.graph },
     })
+
+    const handle = await tasks.trigger<typeof helloWorldTask>(
+      "hello-world",
+      {
+        message: `Run workflow ${workflow.id}`,
+      }
+    )
 
     return handle
   })
@@ -110,4 +158,22 @@ export const deleteWorkflowFn = createServerFn({ method: "POST" })
     throw redirect({
       href: "/",
     })
+  })
+
+export const cancelWorkflowFn = createServerFn({ method: "POST" })
+  .validator((data: { workflowId: string }) => data)
+  .handler(async ({ data }) => {
+    const { orgId } = await auth()
+
+    if (!orgId) {
+      throw new Error("No active organization")
+    }
+
+    const workflow = await getWorkflow(orgId, data.workflowId)
+
+    if (!workflow) {
+      throw new Error("Workflow not found")
+    }
+
+    await runs.cancel(workflow.id)
   })
