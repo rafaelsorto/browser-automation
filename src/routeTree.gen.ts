@@ -9,22 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TestRouteImport } from './routes/test'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
+import { Route as TestRouteImport } from './routes/test'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
 import { Route as SessionTasksChooseOrganizationRouteImport } from './routes/session-tasks/choose-organization'
-import { Route as ApiAuthLiveblocksRouteImport } from './routes/api.auth.liveblocks'
-import { Route as DashboardWorkflowsIdRouteImport } from './routes/_dashboard/workflows/$id'
-import { Route as AuthSignUpSplatRouteImport } from './routes/_auth/sign-up.$'
 import { Route as AuthSignInSplatRouteImport } from './routes/_auth/sign-in.$'
+import { Route as AuthSignUpSplatRouteImport } from './routes/_auth/sign-up.$'
+import { Route as DashboardWorkflowsIdRouteImport } from './routes/_dashboard/workflows/$id'
+import { Route as ApiAuthLiveblocksRouteImport } from './routes/api.auth.liveblocks'
 
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/_dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TestRoute = TestRouteImport.update({
   id: '/test',
   path: '/test',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/_dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
@@ -38,9 +38,14 @@ const SessionTasksChooseOrganizationRoute =
     path: '/session-tasks/choose-organization',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiAuthLiveblocksRoute = ApiAuthLiveblocksRouteImport.update({
-  id: '/api/auth/liveblocks',
-  path: '/api/auth/liveblocks',
+const AuthSignInSplatRoute = AuthSignInSplatRouteImport.update({
+  id: '/_auth/sign-in/$',
+  path: '/sign-in/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSignUpSplatRoute = AuthSignUpSplatRouteImport.update({
+  id: '/_auth/sign-up/$',
+  path: '/sign-up/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardWorkflowsIdRoute = DashboardWorkflowsIdRouteImport.update({
@@ -48,14 +53,9 @@ const DashboardWorkflowsIdRoute = DashboardWorkflowsIdRouteImport.update({
   path: '/workflows/$id',
   getParentRoute: () => DashboardRoute,
 } as any)
-const AuthSignUpSplatRoute = AuthSignUpSplatRouteImport.update({
-  id: '/_auth/sign-up/$',
-  path: '/sign-up/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthSignInSplatRoute = AuthSignInSplatRouteImport.update({
-  id: '/_auth/sign-in/$',
-  path: '/sign-in/$',
+const ApiAuthLiveblocksRoute = ApiAuthLiveblocksRouteImport.update({
+  id: '/api/auth/liveblocks',
+  path: '/api/auth/liveblocks',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -130,18 +130,18 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/test': {
-      id: '/test'
-      path: '/test'
-      fullPath: '/test'
-      preLoaderRoute: typeof TestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_dashboard': {
       id: '/_dashboard'
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/test': {
+      id: '/test'
+      path: '/test'
+      fullPath: '/test'
+      preLoaderRoute: typeof TestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_dashboard/': {
@@ -158,11 +158,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SessionTasksChooseOrganizationRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/auth/liveblocks': {
-      id: '/api/auth/liveblocks'
-      path: '/api/auth/liveblocks'
-      fullPath: '/api/auth/liveblocks'
-      preLoaderRoute: typeof ApiAuthLiveblocksRouteImport
+    '/_auth/sign-in/$': {
+      id: '/_auth/sign-in/$'
+      path: '/sign-in/$'
+      fullPath: '/sign-in/$'
+      preLoaderRoute: typeof AuthSignInSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/sign-up/$': {
+      id: '/_auth/sign-up/$'
+      path: '/sign-up/$'
+      fullPath: '/sign-up/$'
+      preLoaderRoute: typeof AuthSignUpSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_dashboard/workflows/$id': {
@@ -172,18 +179,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardWorkflowsIdRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/_auth/sign-up/$': {
-      id: '/_auth/sign-up/$'
-      path: '/sign-up/$'
-      fullPath: '/sign-up/$'
-      preLoaderRoute: typeof AuthSignUpSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_auth/sign-in/$': {
-      id: '/_auth/sign-in/$'
-      path: '/sign-in/$'
-      fullPath: '/sign-in/$'
-      preLoaderRoute: typeof AuthSignInSplatRouteImport
+    '/api/auth/liveblocks': {
+      id: '/api/auth/liveblocks'
+      path: '/api/auth/liveblocks'
+      fullPath: '/api/auth/liveblocks'
+      preLoaderRoute: typeof ApiAuthLiveblocksRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
