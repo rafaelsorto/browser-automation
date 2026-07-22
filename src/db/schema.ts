@@ -36,7 +36,7 @@ export type WorkflowEdge = {
 export type WorkflowGraph = {
   nodes: StepNodeType[]
   edges: WorkflowEdge[]
-}
+} | null
 
 export const workflows = pgTable("workflows", {
   id: uuid("id").primaryKey().defaultRandom(),

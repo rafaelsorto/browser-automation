@@ -19,13 +19,11 @@ import {
   deleteWorkflowRoom,
   ensureWorkflowRoom,
 } from "@/lib/liveblocks.server"
-import type { helloWorldTask } from "@/trigger/example"
 
 import { validateGraph } from "@/features/workflows/lib/validate-graph"
 
-import type { StepNodeType } from "./nodes/node-registry"
-import type { Edge } from "@xyflow/react"
 import type { WorkflowGraph } from "@/db/schema"
+import type { runWorkflowTask } from "./tasks/run-workflow"
 
 export const saveWorkflowGraphFn = createServerFn({
   method: "POST",
@@ -122,11 +120,13 @@ export const runWorkflowFn = createServerFn({
       data: { id: workflow.id, graph: data.graph },
     })
 
-    const handle = await tasks.trigger<typeof helloWorldTask>(
-      "hello-world",
+    const handle = await tasks.trigger<typeof runWorkflowTask>(
+      "run-workflow",
       {
-        message: `Run workflow ${workflow.id}`,
-      }
+        workflowId: workflow.id,
+        orgId: orgId,
+      },
+      { tags: [`workflow:${workflow.id}`] }
     )
 
     return handle

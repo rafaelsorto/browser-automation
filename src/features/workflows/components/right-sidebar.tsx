@@ -45,8 +45,8 @@ import type {
   StepNodeKind,
   StepNodeType,
 } from "@/features/workflows/nodes/node-registry"
-import type { helloWorldTask } from "@/trigger/example"
 import type { WorkflowGraph } from "@/db/schema"
+import type { runWorkflowTask } from "../tasks/run-workflow"
 
 // This file builds up to the RightSidebar component exported at the bottom: a
 // header with workflow actions (delete, run), then two tabs — a Toolbar for
@@ -383,7 +383,7 @@ function RunButton({ workflowId }: { workflowId: string }) {
     null
   )
 
-  const { run, error } = useRealtimeRun<typeof helloWorldTask>(
+  const { run, error } = useRealtimeRun<typeof runWorkflowTask>(
     handle?.id,
     {
       accessToken: handle?.publicAccessToken,
