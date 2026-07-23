@@ -1,6 +1,7 @@
 import type { Stagehand } from "@browserbasehq/stagehand"
 import type { ActionNodeType } from "./node-registry"
 import { act } from "./act"
+import { extract } from "./extract"
 import { openUrl } from "./open-url"
 
 export type NodeContext = {
@@ -18,6 +19,11 @@ export const nodeExecutors: Record<ActionNodeType, NodeExecutor> = {
     }),
   act: async ({ values, getStagehand }) =>
     act({
+      stagehand: await getStagehand(),
+      instruction: values.instruction ?? "",
+    }),
+  extract: async ({ values, getStagehand }) =>
+    extract({
       stagehand: await getStagehand(),
       instruction: values.instruction ?? "",
     }),

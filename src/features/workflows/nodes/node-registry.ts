@@ -1,5 +1,5 @@
 import type { Node } from "@xyflow/react"
-import { Globe, MousePointerClick, Pointer } from "lucide-react"
+import { Globe, MousePointerClick, Pointer, TextSearch } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
 export type StepNodeKind = "trigger" | "action"
@@ -92,6 +92,28 @@ export const nodeRegistry = {
       {
         path: "url",
         label: "URL",
+      },
+    ],
+  },
+  extract: {
+    type: "extract",
+    kind: "action",
+    label: "Extract",
+    icon: TextSearch,
+    accent: "bg-sky-500 text-white",
+    fields: [
+      {
+        key: "instruction",
+        label: "Instruction",
+        placeholder: "Extract the page title",
+        multiline: true,
+        required: true,
+      },
+    ],
+    outputs: [
+      {
+        path: "extraction",
+        label: "Extraction",
       },
     ],
   },
