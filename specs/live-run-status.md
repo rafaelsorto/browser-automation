@@ -56,7 +56,7 @@ frontend skill.
 ## 3. Wire the subscription into the page
 
 ```
-In the workflow page (@page.tsx), wire up the realtime subscription.
+In the workflow page workflows/$id, wire up the realtime subscription.
 
 Mint a read-only public token scoped to this workflow's run tag, good for about an
 hour, and wrap the canvas shell in the `WorkflowRunsProvider` we just made — passing
