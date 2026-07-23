@@ -1,6 +1,7 @@
 import toposort from "toposort"
 import { logger, task } from "@trigger.dev/sdk"
-
+import { Stagehand } from "@browserbasehq/stagehand"
+import { nodeExecutors } from "@/features/workflows/nodes/node-executors"
 import { getWorkflow } from "@/features/workflows/data.server"
 
 export const runWorkflowTask = task({
@@ -37,13 +38,41 @@ export const runWorkflowTask = task({
       steps: order.length,
     })
 
+    let stagehand: Stagehand | undefined
+
+    const getStagehand = async () => {
+      if (stagehand) return stagehand
+
+      stagehand = new Stagehand({
+        env: "BROWSERBASE",
+        apiKey: process.env.BROWSERBASE_API_KEY,
+        model: "google/gemini-2.5-flash",
+        disablePino: true,
+      })
+
+      await stagehand.init()
+
+      return stagehand
+    }
+
     for (const id of order) {
       const node = byId.get(id)
-      if (!node) {
+      if (!node || node.data.type === "start") {
         continue
       }
 
       logger.log(`Running step: ${node.data.title}`)
+
+      const executor = nodeExecutors[node.data.type]
+
+      await executor({
+        values: node.data.values,
+        getStagehand: getStagehand,
+      })
     }
+
+    await stagehand?.close()
+
+    return { steps: order.length }
   },
 })

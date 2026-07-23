@@ -7,7 +7,16 @@ import { nitro } from "nitro/vite"
 
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
-  plugins: [devtools(), tailwindcss(), tanstackStart(), nitro(), viteReact()],
+  plugins: [
+    devtools(),
+    tailwindcss(),
+    tanstackStart(),
+    nitro(),
+    viteReact(),
+  ],
+  server: {
+    allowedHosts: ["qomercio.url.sv"],
+  },
 })
 
 export default config
