@@ -1,7 +1,7 @@
 import { auth } from "@clerk/tanstack-react-start/server"
 import { redirect } from "@tanstack/react-router"
 import { createServerFn } from "@tanstack/react-start"
-import { tasks, runs } from "@trigger.dev/sdk"
+import { tasks, runs, auth as triggerAuth } from "@trigger.dev/sdk"
 
 import {
   createWorkflow,
@@ -78,6 +78,19 @@ export const getWorkflowFn = createServerFn()
 
     await ensureWorkflowRoom(workflow.id, orgId, workflow.name)
     return serializeWorkflow(workflow)
+  })
+
+export const createWorkflowRunsTokenFn = createServerFn()
+  .validator((data: { workflowId: string }) => data)
+  .handler(async ({ data }) => {
+    return triggerAuth.createPublicToken({
+      scopes: {
+        read: {
+          tags: [`workflow:${data.workflowId}`],
+        },
+      },
+      expirationTime: "1hr",
+    })
   })
 
 export const createWorkflowFn = createServerFn({ method: "POST" })

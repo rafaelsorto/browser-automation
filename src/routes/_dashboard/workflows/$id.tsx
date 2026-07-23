@@ -1,7 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router"
 import type { ErrorComponentProps } from "@tanstack/react-router"
 import { ReactFlowProvider } from "@xyflow/react"
-import { auth } from "@trigger.dev/sdk"
 import { AlertCircleIcon, SearchXIcon } from "lucide-react"
 
 import {
@@ -15,7 +14,10 @@ import { Spinner } from "@/components/ui/spinner"
 import { Room } from "@/features/workflows/components/room"
 import { WorkflowRunsProvider } from "@/features/workflows/components/workflow-runs-provider"
 import { WorkflowShell } from "@/features/workflows/components/workflow-shell"
-import { getWorkflowFn } from "@/features/workflows/data"
+import {
+  createWorkflowRunsTokenFn,
+  getWorkflowFn,
+} from "@/features/workflows/data"
 
 export const Route = createFileRoute("/_dashboard/workflows/$id")({
   loader: async ({ params }) => {
@@ -25,13 +27,8 @@ export const Route = createFileRoute("/_dashboard/workflows/$id")({
       throw notFound()
     }
 
-    const publicAccessToken = await auth.createPublicToken({
-      scopes: {
-        read: {
-          tags: [`workflow:${workflow.id}`],
-        },
-      },
-      expirationTime: "1hr",
+    const publicAccessToken = await createWorkflowRunsTokenFn({
+      data: { workflowId: workflow.id },
     })
 
     return { workflow, publicAccessToken }
