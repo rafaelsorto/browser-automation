@@ -1,5 +1,12 @@
 import type { Node } from "@xyflow/react"
-import { Globe, MousePointerClick, Pointer, TextSearch } from "lucide-react"
+import {
+  Bot,
+  Eye,
+  Globe,
+  MousePointerClick,
+  Pointer,
+  TextSearch,
+} from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
 export type StepNodeKind = "trigger" | "action"
@@ -114,6 +121,58 @@ export const nodeRegistry = {
       {
         path: "extraction",
         label: "Extraction",
+      },
+    ],
+  },
+  observe: {
+    type: "observe",
+    kind: "action",
+    label: "Observe",
+    icon: Eye,
+    accent: "bg-rose-500 text-white",
+    fields: [
+      {
+        key: "instruction",
+        label: "Instruction",
+        placeholder: "Find the submit button",
+        multiline: true,
+        required: true,
+      },
+    ],
+    outputs: [
+      {
+        path: "matches",
+        label: "Matches",
+      },
+    ],
+  },
+  agent: {
+    type: "agent",
+    kind: "action",
+    label: "Agent",
+    icon: Bot,
+    accent: "bg-violet-500 text-white",
+    fields: [
+      {
+        key: "instruction",
+        label: "Instruction",
+        placeholder: "Search for the stock price of NVDA",
+        multiline: true,
+        required: true,
+      },
+    ],
+    outputs: [
+      {
+        path: "success",
+        label: "Success",
+      },
+      {
+        path: "message",
+        label: "Message",
+      },
+      {
+        path: "completed",
+        label: "Completed",
       },
     ],
   },
