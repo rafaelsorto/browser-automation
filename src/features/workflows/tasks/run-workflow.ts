@@ -1,9 +1,14 @@
 import toposort from "toposort"
-import { logger, task } from "@trigger.dev/sdk"
+import { logger, metadata, task } from "@trigger.dev/sdk"
 import { Stagehand } from "@browserbasehq/stagehand"
 import { nodeExecutors } from "@/features/workflows/nodes/node-executors"
 import { getWorkflow } from "@/features/workflows/data.server"
 import { interpolate } from "@/features/workflows/lib/interpolate"
+
+export type RunStep = {
+  id: string
+  status: "pending" | "running" | "done" | "failed"
+}
 
 export const runWorkflowTask = task({
   id: "run-workflow",
@@ -39,6 +44,12 @@ export const runWorkflowTask = task({
       steps: order.length,
     })
 
+    const steps: RunStep[] = order
+      .filter((id) => byId.get(id)?.data.type !== "start")
+      .map((id) => ({ id, status: "pending" }))
+
+    metadata.set("steps", steps)
+
     let stagehand: Stagehand | undefined
 
     const getStagehand = async () => {
@@ -64,7 +75,13 @@ export const runWorkflowTask = task({
         continue
       }
 
+      const step = steps.find((s) => s.id === id)!
+
       logger.log(`Running step: ${node.data.title}`)
+
+      step.status = "running"
+      metadata.set("steps", steps)
+      await metadata.flush()
 
       const executor = nodeExecutors[node.data.type]
 
@@ -75,14 +92,25 @@ export const runWorkflowTask = task({
         ])
       )
 
-      outputs[id] = await executor({
-        values,
-        getStagehand,
-      })
+      try {
+        outputs[id] = await executor({
+          values,
+          getStagehand,
+        })
+      } catch (error) {
+        step.status = "failed"
+        metadata.set("steps", steps)
+        await metadata.flush()
+        await stagehand?.close()
+        throw error
+      }
+
+      step.status = "done"
+      metadata.set("steps", steps)
     }
 
     await stagehand?.close()
 
-    return { steps: order.length }
+    return { steps }
   },
 })
