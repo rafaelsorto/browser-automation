@@ -1,5 +1,6 @@
 import type { Stagehand } from "@browserbasehq/stagehand"
 import type { ActionNodeType } from "./node-registry"
+import { act } from "./act"
 import { openUrl } from "./open-url"
 
 export type NodeContext = {
@@ -14,5 +15,10 @@ export const nodeExecutors: Record<ActionNodeType, NodeExecutor> = {
     openUrl({
       stagehand: await getStagehand(),
       url: values.url ?? "",
+    }),
+  act: async ({ values, getStagehand }) =>
+    act({
+      stagehand: await getStagehand(),
+      instruction: values.instruction ?? "",
     }),
 }

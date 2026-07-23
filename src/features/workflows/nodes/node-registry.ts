@@ -1,5 +1,5 @@
 import type { Node } from "@xyflow/react"
-import { Globe, MousePointerClick } from "lucide-react"
+import { Globe, MousePointerClick, Pointer } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
 export type StepNodeKind = "trigger" | "action"
@@ -62,6 +62,36 @@ export const nodeRegistry = {
       {
         path: "title",
         label: "Title",
+      },
+    ],
+  },
+  act: {
+    type: "act",
+    kind: "action",
+    label: "Act",
+    icon: Pointer,
+    accent: "bg-amber-500 text-white",
+    fields: [
+      {
+        key: "instruction",
+        label: "Instruction",
+        placeholder: "Click the sign in button",
+        multiline: true,
+        required: true,
+      },
+    ],
+    outputs: [
+      {
+        path: "success",
+        label: "Success",
+      },
+      {
+        path: "message",
+        label: "Message",
+      },
+      {
+        path: "url",
+        label: "URL",
       },
     ],
   },
