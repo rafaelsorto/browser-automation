@@ -34,6 +34,7 @@ import {
   deleteWorkflowFn,
   runWorkflowFn,
 } from "@/features/workflows/data"
+import { useUpstreamConnections } from "@/features/workflows/hooks/use-upstream-connections"
 import { nodeRegistry } from "@/features/workflows/nodes/node-registry"
 import { cn } from "@/lib/utils"
 
@@ -45,6 +46,7 @@ import type {
   StepNodeKind,
   StepNodeType,
 } from "@/features/workflows/nodes/node-registry"
+import type { UpstreamConnection } from "@/features/workflows/hooks/use-upstream-connections"
 import type { WorkflowGraph } from "@/db/schema"
 import type { runWorkflowTask } from "../tasks/run-workflow"
 
@@ -147,10 +149,12 @@ function Field({
   field,
   value,
   onChange,
+  onFocus,
 }: {
   field: NodeField
   value: string
   onChange: (value: string) => void
+  onFocus?: () => void
 }) {
   const control = field.multiline ? (
     <Textarea
@@ -158,6 +162,7 @@ function Field({
       value={value}
       placeholder={field.placeholder}
       onChange={(e) => onChange(e.target.value)}
+      onFocus={onFocus}
     />
   ) : (
     <Input
@@ -165,6 +170,7 @@ function Field({
       value={value}
       placeholder={field.placeholder}
       onChange={(e) => onChange(e.target.value)}
+      onFocus={onFocus}
     />
   )
 
@@ -181,9 +187,52 @@ function Field({
   )
 }
 
+function ConnectionChips({
+  connections,
+  onInsert,
+}: {
+  connections: UpstreamConnection[]
+  onInsert: (token: string) => void
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <p className="text-xs font-medium">Connections</p>
+      <div className="flex flex-wrap gap-1.5">
+        {connections.map((connection) => (
+          <button
+            key={connection.token}
+            type="button"
+            title={connection.token}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => onInsert(connection.token)}
+            className="inline-flex max-w-full items-center gap-1.5 rounded-md border border-border bg-muted/40 px-1.5 py-1 text-left text-xs hover:bg-muted"
+          >
+            <NodeIcon
+              type={connection.type}
+              className="size-4 rounded [&_svg]:size-2.5"
+            />
+            <span className="truncate">{connection.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // The Editor tab: one input per field on the selected node, or an empty state.
 function Inspector({ node }: { node: StepNodeType | undefined }) {
   const { updateNodeData } = useReactFlow<StepNodeType>()
+  const connections = useUpstreamConnections(node?.id)
+  const [activeFieldKey, setActiveFieldKey] = useState<string>()
+
+  useEffect(() => {
+    if (!node) {
+      setActiveFieldKey(undefined)
+      return
+    }
+
+    setActiveFieldKey(nodeRegistry[node.data.type].fields[0]?.key)
+  }, [node?.id])
 
   if (!node) {
     return (
@@ -197,6 +246,42 @@ function Inspector({ node }: { node: StepNodeType | undefined }) {
 
   const { type, title, values } = node.data
   const def: NodeDefinition = nodeRegistry[type]
+  const targetFieldKey = activeFieldKey ?? def.fields[0]?.key
+
+  const insertToken = (token: string) => {
+    if (!targetFieldKey) return
+
+    const current = values[targetFieldKey] ?? ""
+    const active = document.activeElement
+    const fieldIsFocused =
+      (active instanceof HTMLInputElement ||
+        active instanceof HTMLTextAreaElement) &&
+      active.id === targetFieldKey
+
+    const start = fieldIsFocused
+      ? (active.selectionStart ?? current.length)
+      : current.length
+    const end = fieldIsFocused
+      ? (active.selectionEnd ?? current.length)
+      : current.length
+
+    const next = current.slice(0, start) + token + current.slice(end)
+
+    updateNodeData(node.id, {
+      values: {
+        ...values,
+        [targetFieldKey]: next,
+      },
+    })
+
+    if (fieldIsFocused) {
+      const caret = start + token.length
+      requestAnimationFrame(() => {
+        active.focus()
+        active.setSelectionRange(caret, caret)
+      })
+    }
+  }
 
   return (
     <Section title={title} icon={<NodeIcon type={type} />}>
@@ -211,6 +296,7 @@ function Inspector({ node }: { node: StepNodeType | undefined }) {
               key={field.key}
               field={field}
               value={values[field.key] ?? ""}
+              onFocus={() => setActiveFieldKey(field.key)}
               onChange={(value) => {
                 updateNodeData(node.id, {
                   values: {
@@ -221,6 +307,12 @@ function Inspector({ node }: { node: StepNodeType | undefined }) {
               }}
             />
           ))
+        )}
+        {connections.length > 0 && (
+          <ConnectionChips
+            connections={connections}
+            onInsert={insertToken}
+          />
         )}
       </div>
     </Section>
