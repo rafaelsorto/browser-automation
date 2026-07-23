@@ -14,4 +14,9 @@ export async function openUrl({
   }
 
   await page.goto(url, { waitUntil: "load", timeoutMs: 30_000 })
+
+  return {
+    url: page.url(),
+    title: await page.title(),
+  }
 }

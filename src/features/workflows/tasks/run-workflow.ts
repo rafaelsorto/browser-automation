@@ -3,6 +3,7 @@ import { logger, task } from "@trigger.dev/sdk"
 import { Stagehand } from "@browserbasehq/stagehand"
 import { nodeExecutors } from "@/features/workflows/nodes/node-executors"
 import { getWorkflow } from "@/features/workflows/data.server"
+import { interpolate } from "@/features/workflows/lib/interpolate"
 
 export const runWorkflowTask = task({
   id: "run-workflow",
@@ -55,6 +56,8 @@ export const runWorkflowTask = task({
       return stagehand
     }
 
+    const outputs: Record<string, unknown> = {}
+
     for (const id of order) {
       const node = byId.get(id)
       if (!node || node.data.type === "start") {
@@ -65,9 +68,16 @@ export const runWorkflowTask = task({
 
       const executor = nodeExecutors[node.data.type]
 
-      await executor({
-        values: node.data.values,
-        getStagehand: getStagehand,
+      const values = Object.fromEntries(
+        Object.entries(node.data.values).map(([key, value]) => [
+          key,
+          interpolate(value, outputs),
+        ])
+      )
+
+      outputs[id] = await executor({
+        values,
+        getStagehand,
       })
     }
 
