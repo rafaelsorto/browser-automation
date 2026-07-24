@@ -3,6 +3,7 @@ import {
   Bot,
   Eye,
   Globe,
+  Mail,
   MousePointerClick,
   Pointer,
   TextSearch,
@@ -173,6 +174,40 @@ export const nodeRegistry = {
       {
         path: "completed",
         label: "Completed",
+      },
+    ],
+  },
+  "send-email": {
+    type: "send-email",
+    kind: "action",
+    label: "Send Email",
+    icon: Mail,
+    accent: "bg-indigo-500 text-white",
+    fields: [
+      {
+        key: "to",
+        label: "To",
+        placeholder: "user@example.com",
+        required: true,
+      },
+      {
+        key: "subject",
+        label: "Subject",
+        placeholder: "Hello from your workflow",
+        required: true,
+      },
+      {
+        key: "body",
+        label: "Body",
+        placeholder: "Write your message…",
+        multiline: true,
+        required: true,
+      },
+    ],
+    outputs: [
+      {
+        path: "id",
+        label: "Email ID",
       },
     ],
   },

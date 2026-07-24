@@ -126,6 +126,12 @@
       "sourceType": "github",
       "skillPath": "skills/neon-postgres-egress-optimizer/SKILL.md",
       "computedHash": "618b5bc5c65ff143adb028ef3bb4f49d800e6b524339cf63327d86df264cbf1a"
+    },
+    "resend": {
+      "source": "resend/resend-skills",
+      "sourceType": "github",
+      "skillPath": "skills/resend/SKILL.md",
+      "computedHash": "8935525a4d7fa21298616b7c6150148a7df3afcfffd7ea9dca6fdac155fe0ece"
     }
   }
 }
