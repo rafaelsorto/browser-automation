@@ -5,9 +5,25 @@ import { nodeExecutors } from "@/features/workflows/nodes/node-executors"
 import { getWorkflow } from "@/features/workflows/data.server"
 import { interpolate } from "@/features/workflows/lib/interpolate"
 
+import type { NodeType } from "@/features/workflows/nodes/node-registry"
+
+/** JSON-serializable value — required for Trigger metadata + task output. */
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue }
+
 export type RunStep = {
   id: string
+  type: NodeType
+  title: string
   status: "pending" | "running" | "done" | "failed"
+  durationMs?: number
+  output?: JsonValue
+  error?: string
 }
 
 export const runWorkflowTask = task({
@@ -46,7 +62,15 @@ export const runWorkflowTask = task({
 
     const steps: RunStep[] = order
       .filter((id) => byId.get(id)?.data.type !== "start")
-      .map((id) => ({ id, status: "pending" }))
+      .map((id) => {
+        const node = byId.get(id)!
+        return {
+          id,
+          type: node.data.type,
+          title: node.data.title,
+          status: "pending" as const,
+        }
+      })
 
     metadata.set("steps", steps)
 
@@ -83,6 +107,8 @@ export const runWorkflowTask = task({
       metadata.set("steps", steps)
       await metadata.flush()
 
+      const startedAt = Date.now()
+
       const executor = nodeExecutors[node.data.type]
 
       const values = Object.fromEntries(
@@ -93,20 +119,26 @@ export const runWorkflowTask = task({
       )
 
       try {
-        outputs[id] = await executor({
+        const output = (await executor({
           values,
           getStagehand,
-        })
+        })) as JsonValue
+        outputs[id] = output
+        step.output = output
+        step.durationMs = Date.now() - startedAt
+        step.status = "done"
+        metadata.set("steps", steps)
+        await metadata.flush()
       } catch (error) {
         step.status = "failed"
+        step.durationMs = Date.now() - startedAt
+        step.error =
+          error instanceof Error ? error.message : String(error)
         metadata.set("steps", steps)
         await metadata.flush()
         await stagehand?.close()
         throw error
       }
-
-      step.status = "done"
-      metadata.set("steps", steps)
     }
 
     await stagehand?.close()
